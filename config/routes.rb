@@ -1,7 +1,11 @@
 Rails.application.routes.draw do
   root 'application#hello'
+
   resources :events
+  get 'events/actors/:id', to:'events#get_events_by_actor_id'
   delete 'erase', to: 'events#erase'
+  get 'actors', to: 'actors#index'
+  put 'actors', to: 'actors#update'
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 

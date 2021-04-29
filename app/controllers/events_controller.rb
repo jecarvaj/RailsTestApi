@@ -11,7 +11,7 @@ class EventsController < ApplicationController
   # GET /events/1
   # GET /events/1.json
   def show
-    render json: @event, status: 200
+    render json: EventSerializer.new(@event).as_json, status: 200
   end
 
   # DELETE /erase
@@ -34,7 +34,7 @@ class EventsController < ApplicationController
 
     @event = Event.new
     @event.id = params[:id]
-    @event.event_type = params[:event]
+    @event.type = params[:type]
     @event.created_at = params[:created_at]
     @event.actor      = Actor.find_or_create_by(id: actor[:id], login: actor[:login], avatar_url: actor[:avatar_url])
     @event.repo       = Repo.find_or_create_by(id: repo[:id], name: repo[:name], url: repo[:url])
@@ -62,10 +62,25 @@ class EventsController < ApplicationController
     @event.destroy
   end
 
+  def get_events_by_actor_id
+    id = params[:id]
+    unless  Actor.find_by_id(id)
+      return render json: {}, status: 404
+    end
+
+    events = Event.where(:actor_id => id).order(:actor_id, :id, :created_at)
+  
+    render json: events, each_serializer: EventSerializer, status: 200
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_event
-      @event = Event.find(params[:id])
+      begin
+        @event = Event.find(params[:id])
+      rescue
+        return render json: {}, status: 404
+      end
     end
 
     # Only allow a list of trusted parameters through.

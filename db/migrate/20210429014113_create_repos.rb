@@ -4,8 +4,6 @@ class CreateRepos < ActiveRecord::Migration[5.0]
       t.integer :id
       t.string :name
       t.string :url
-
-      t.timestamps
     end
   end
 end
